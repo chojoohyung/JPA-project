@@ -1,0 +1,9 @@
+package templates;
+
+import ch.qos.logback.core.net.SyslogOutputStream;
+
+public class test {
+		private void syso() {
+			System.out.println();
+		}
+}
