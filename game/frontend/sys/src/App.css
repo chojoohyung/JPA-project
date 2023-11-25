@@ -27,6 +27,12 @@
 .App-link {
   color: #61dafb;
 }
+.Logintext{
+  background-color: #fb6161;
+  width: 10%;
+  margin: 0 auto;
+}
+button{}
 
 @keyframes App-logo-spin {
   from {
