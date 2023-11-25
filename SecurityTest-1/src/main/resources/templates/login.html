@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form th:action="@{/login}" method="post">
+    
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required autofocus>
+        <br>
+        <button type="submit">Login</button>
+    </form>
+    
+    <p th:if="${param.error}" style="color: red;">
+        로그아웃 실패: 동시 접속 제어에 의해 세션 만료되었습니다.</p>
+</body>
+</html>
