@@ -1,10 +1,10 @@
-package com.security;
+package com.portfolio;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SecurityTest1ApplicationTests {
+class WebSocketChattingServerApplicationTests {
 
 	@Test
 	void contextLoads() {
