@@ -1,11 +1,22 @@
-import Login from "./Login"
+// App.jsx
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './Login';
+import ChattingRoom from './ChattingRoom';
 
 function App() {
-  return (
-    <div >
-  <Login />
+  const [isLoggedIn, setLoggedIn] = useState(false);
 
-    </div>
+  return (
+    <Router>
+      <Routes>
+        {isLoggedIn ? (
+          <Route path="/" element={<ChattingRoom />} />
+        ) : (
+          <Route path="/" element={<Login setLoggedIn={setLoggedIn} />} />
+        )}
+      </Routes>
+    </Router>
   );
 }
 
