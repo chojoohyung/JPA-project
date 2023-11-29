@@ -32,7 +32,8 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin(origins = "*")
 public class TestAPIController {
 	private final ChatRoomService chatRoomService;
-
+	
+	public String usernameData;
 	/*
 	 * 로그인 등록
 	 */
@@ -42,14 +43,9 @@ public class TestAPIController {
             summary = "유저 이름 등록",
             description = "사용자의 이름을 등록합니다."
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "성공적으로 사용자 이름을 등록함",
-            content = @Content(mediaType = "application/json", schema = @Schema(type = "string"))
-    )
 	public ResponseEntity<String> username(@Valid @RequestBody UsernameDto usernameDto, HttpSession session) {
         if (isValidUsername(usernameDto.getUsername())) {
-            session.setAttribute("username", usernameDto.getUsername());
+        	this.usernameData = usernameDto.getUsername();
             System.out.println("로그인 성공");
             return ResponseEntity.ok("성공적으로 사용자 이름을 등록함");
         } else {
@@ -80,7 +76,7 @@ public class TestAPIController {
     )
 	public UsernameDto getUsername(HttpSession session) {
 		UsernameDto usernameDto = new UsernameDto();
-		usernameDto.setUsername((String) session.getAttribute("username"));
+		usernameDto.setUsername(this.usernameData);
 	    return usernameDto;
 	}
 	
