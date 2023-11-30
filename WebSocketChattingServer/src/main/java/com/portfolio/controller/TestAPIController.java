@@ -83,7 +83,7 @@ public class TestAPIController {
 	/*
 	 * 채팅방 리스트 조회
 	 */
-	@GetMapping("/ChatRoom")
+	@GetMapping("/ChatRoomList")
 	public List<ChatRoom> ChatRoomList(){
 		return chatRoomService.ChatRoomList();
 	}
@@ -109,7 +109,7 @@ public class TestAPIController {
 	/*
 	 * 채팅 생성
 	 */
-	@MessageMapping("/chatting/{ChatRoomId}")
+	@MessageMapping("/ChatRoom")
 	@SendTo("/topic/message")
 	public ChattingDto sendData(ChattingDto chattingDto, @PathVariable("ChatRoomId") String ChatRoomId) {
 		
