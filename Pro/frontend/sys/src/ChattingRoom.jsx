@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const ChattingRoom = () => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    const sendGetRequest = async () => {
+    const sendGetRequest = async (e) => {
+     
       try {
         const response = await fetch('http://localhost:8081/ChatRoomList');
         if (response.ok) {
@@ -24,28 +25,34 @@ const ChattingRoom = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Chatting Room</h1>
-      <p>Welcome to the Chatting Room!</p>
+    <div className='all-container'>
+      <div className='List'>;
+        <h1>SMART TALK</h1>
+        <p>채팅방 리스트</p>
+        <button >
+    
+            방 생성 </button>
+        {data && (
 
-      {data && (
-        <div>
-          <h2>Data from Server:</h2>
-          <ul>
-            {data.map((room) => (
-              <li key={room.id}>
-                <p>Title: {room.title || 'No Title'}</p>
-                <p>Number of People: {room.num_of_people}</p>
-                
-                {/* Link를 사용하여 해당 방의 ID를 URL에 포함시키고, '/room/:id'로 이동 */}
-                <Link to={`/room/${room.id}`}>
-                  <button>입장</button>
-                </Link>
-              </li>
-            ))}
-          </ul>
+<div className='ChattinRoomcontainer-'>
+{data.map((room) => (
+  <Link className='L' to={`/room/${room.id}`} key={room.id}>
+    <div className='ChattingRoomList'>
+      <div className="RoomContent">
+        <img className="RoomImage" src="img/img.png" alt="img" />
+        <div className="RoomText">
+          <p>Title: {room.title || 'No Title'}</p>
+          <p>인원 수: {room.num_of_people}</p>
         </div>
-      )}
+      </div>
+    </div>
+  </Link>
+))}
+</div>
+
+
+        )}
+      </div>
     </div>
   );
 };

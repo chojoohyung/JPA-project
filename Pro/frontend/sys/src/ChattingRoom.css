@@ -1,0 +1,50 @@
+.all-container{
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    align-items: center;
+    background-color: white;
+}
+
+.List{
+    position: absolute;
+  top:0;
+  bottom: 0;
+  width: 100%;
+  max-width: 500px;
+  padding: 0 20px;
+
+  left: 50%;
+  transform: translate(-50%, 0);
+  background-color: #f7f7f7;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.L{
+    text-decoration: none;
+}
+.RoomContent {
+    display: flex;
+    align-items: center; 
+    background-color: white;
+    cursor: pointer;
+    padding: 2%;
+  }
+  .RoomContent:hover{
+    background-color: lightgray;
+  }
+  
+  .RoomImage {
+    width: 50px; 
+    height: auto; 
+    margin-right: 10px; 
+  }
+  
+  .RoomText {
+    flex: 1; 
+  }
+  
