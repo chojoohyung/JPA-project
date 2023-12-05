@@ -9,7 +9,7 @@
 .List{
     position: absolute;
   top:0;
-  bottom: 0;
+
   width: 100%;
   max-width: 500px;
   padding: 0 20px;
@@ -33,6 +33,7 @@
     background-color: white;
     cursor: pointer;
     padding: 2%;
+   
   }
   .RoomContent:hover{
     background-color: lightgray;

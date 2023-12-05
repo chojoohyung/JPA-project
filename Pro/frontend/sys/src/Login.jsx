@@ -1,12 +1,20 @@
 // Login.jsx
 import React, { useEffect, useState } from 'react';
-//import { useNavigate } from 'react-router-dom';
+
+
 
 const Login = ({ setLoggedIn }) => {
+
   const [username, setUsername] = useState("");
   const [usernameValid, setUsernameValid] = useState(false);
   const [notAllow, setNotAllow] = useState(true);
- // const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedLoggedIn = localStorage.getItem('isLoggedIn');
+    if (storedLoggedIn === 'true') {
+      setLoggedIn(true);
+    }
+  }, [setLoggedIn]);
 
   const handleUsername = (e) => {
     const inputValue = e.target.value;
@@ -31,22 +39,15 @@ const Login = ({ setLoggedIn }) => {
         body: `username=${encodeURIComponent(username)}`,
       });
 
-      // 응답 처리
       if (response.ok) {
-        // 로그인 성공
         console.log("로그인 성공");
-
-        // isLoggedIn 상태를 업데이트
+        localStorage.setItem('isLoggedIn', 'true');
         setLoggedIn(true);
-
-        // 페이지 전환
-        //navigate.push('/ChattingRoom');
+       
       } else {
-        // 로그인 실패
         console.error("로그인 실패");
       }
     } catch (error) {
-      // 예외 처리
       console.error("로그인 요청 실패", error);
     }
   };
@@ -76,6 +77,9 @@ const Login = ({ setLoggedIn }) => {
             <button disabled={notAllow} className='bottomButton' onClick={handleLogin}>
               입장
             </button>
+            
+          
+           
           </div>
         </div>
       </div>
