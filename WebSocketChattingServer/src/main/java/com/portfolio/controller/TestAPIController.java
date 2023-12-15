@@ -1,18 +1,20 @@
 package com.portfolio.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.portfolio.dto.ChattingDto;
+import com.portfolio.dto.Message;
 import com.portfolio.dto.UsernameDto;
 import com.portfolio.entity.ChatRoom;
 import com.portfolio.service.ChatRoomService;
@@ -88,14 +90,16 @@ public class TestAPIController {
 		return chatRoomService.ChatRoomList();
 	}
 	
+	
+	
 	/*
 	 * 채팅방 생성
 	 */
 	@PostMapping("/createChatRoom")
 	public void createChatRoom(String title, int num_of_people) {
 		ChatRoom chatRoom = new ChatRoom();
-		if(title == null) {
-			title = "~님 방";
+		if(title.equals("")) {
+			title = this.usernameData+"님 방";
 		}
 		if (num_of_people <= 0 || num_of_people > 10) {
 			num_of_people = 10;
@@ -109,10 +113,27 @@ public class TestAPIController {
 	/*
 	 * 채팅 생성
 	 */
-	@MessageMapping("/ChatRoom")
+	@MessageMapping("/Chat")
 	@SendTo("/topic/message")
-	public ChattingDto sendData(ChattingDto chattingDto, @PathVariable("ChatRoomId") String ChatRoomId) {
+	public ChattingDto sendData(ChattingDto chattingDto) {
+		System.out.println(chattingDto.toString());
+		chattingDto.setCreateDate(LocalDateTime.now());
 		
 		return chattingDto;
 	}
+	
+	
+	@MessageMapping("/sendMessage/{id}/{content}")
+    @SendTo("/topic/messages/{id}")
+    public ChattingDto sendMessage(@DestinationVariable(value = "id") String id,  @DestinationVariable(value = "content") String content) {
+		ChattingDto chattingDto = new ChattingDto();
+		chattingDto.setUsername(this.usernameData);
+		chattingDto.setContent(content);
+		chattingDto.setCreateDate(LocalDateTime.now());
+		System.out.println(id);
+		System.out.println(chattingDto.toString());
+		return chattingDto;
+    }
+	
+	
 }

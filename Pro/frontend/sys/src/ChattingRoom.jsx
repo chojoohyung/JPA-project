@@ -41,7 +41,6 @@ const ChattingRoom = () => {
         },
         body: formData.toString(),
       });
-
       if (response.ok) {
         console.log('채팅방 생성 성공');
         sendGetRequest();
