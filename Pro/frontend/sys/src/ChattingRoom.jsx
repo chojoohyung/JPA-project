@@ -1,11 +1,10 @@
 // ChattingRoom.jsx
 
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link  } from 'react-router-dom';
 
 
 const ChattingRoom = () => {
-
   const [data, setData] = useState([]);
   const [newChatRoomTitle, setNewChatRoomTitle] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');

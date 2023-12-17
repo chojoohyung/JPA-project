@@ -1,35 +1,43 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+// RoomDetail.js
+
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
+import './RoomDetail.css';
 
 const RoomDetail = () => {
-
   const [exitRoom, setExitRoom] = useState(false);
   const navigate = useNavigate();
-  const handleExitRoom = () => {
-    setExitRoom(true);
-    navigate(-1);
-  };
+  const location = useLocation();
+  const roomId = location.pathname.split('/').pop();
 
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [stompClient, setStompClient] = useState(null);
+  const contentRef = useRef();
 
   useEffect(() => {
-    // SockJS 연결 설정
-    const socket = new SockJS('http://localhost:8081/ws'); // SockJS 서버 주소로 변경하세요
+    const socket = new SockJS(`http://localhost:8081/ws`);
     const stomp = Stomp.over(socket);
     setStompClient(stomp);
 
-    stomp.connect({}, () => {
-      // 연결 성공 시 실행
-      console.log('Connected to SockJS');
-      stomp.subscribe('/topic/messages/1', (message) => {
-        // 새로운 메시지 도착 시 실행
-        const newMessage = JSON.parse(message.body);
+    const handleNewMessage = (message) => {
+      const newMessage = JSON.parse(message.body);
+
+      // 중복 메시지 체크
+      if (!messages.some((msg) => msg.content === newMessage.content)) {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
-      });
+      }
+    };
+
+    stomp.connect({}, () => {
+      console.log('Connected to SockJS');
+
+      // 중복 Subscription 방지
+      if (!stomp.subscriptions[`/topic/messages/${roomId}`]) {
+        stomp.subscribe(`/topic/messages/${roomId}`, handleNewMessage);
+      }
     });
 
     // 컴포넌트 언마운트 시 SockJS 연결 해제
@@ -38,54 +46,85 @@ const RoomDetail = () => {
         stomp.disconnect();
       }
     };
-  }, []);
+  }, [roomId, messages]);
+
+  const handleExitRoom = () => {
+    setExitRoom(true);
+    navigate(-1);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
 
   const sendMessage = () => {
     if (stompClient && inputMessage.trim() !== '') {
       const message = { content: inputMessage };
 
-      // 메시지 전송
       stompClient.send(
-        '/app/sendMessage/' + '1' + '/' + inputMessage,
-        {}, // 헤더 설정 없이 전송
-
+        `/app/sendMessage/${roomId}/${inputMessage}`,
+        {},
+        JSON.stringify(message)
       );
+
       console.log(JSON.stringify(message));
       setInputMessage('');
     }
   };
 
+  useEffect(() => {
+    // 메시지가 업데이트될 때마다 스크롤을 아래로 이동
+    const scrollToBottom = () => {
+      if (contentRef.current) {
+        contentRef.current.scrollTop = contentRef.current.scrollHeight;
+      }
+    };
+
+    scrollToBottom();
+  }, [messages]);
 
   return (
-    <div>
-      <div>
+    <div className='all-container'>
+      <div className='List'>
+        {exitRoom ? (
+          <p>out</p>
+        ) : (
+          <button onClick={handleExitRoom}>방 나가기</button>
+        )}
         <h2>Chat Room</h2>
-        <div style={{ maxHeight: '300px', overflowY: 'auto', border: '1px solid #ccc', padding: '10px' }}>
-          {messages.map((msg, index) => (
-            <div key={index}>
-            <p>Content: {msg.content}</p>
-            {msg.username && <p>Username: {msg.username}</p>}
-            {msg.createDate && <p>Create Date: {new Date(msg.createDate).toLocaleString()}</p>}
+        <div className='chat-container'>
+          <div className='contentdesign chat-messages' ref={contentRef}>
+            {messages.map((msg, index) => (
+              <div key={index} className='message'>
+                {msg.username && <p className='message-username'>{msg.username}</p>}
+                <p className='message-content'>{msg.content}</p>
+                {msg.createDate && (
+                  <span className='message-date'> {new Date(msg.createDate).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}</span>
+                )}
+              </div>
+            ))}
           </div>
-          ))}
         </div>
       </div>
-      <div>
+      <div className='chatInputContainer'>
         <input
-          type="text"
-          placeholder="Type your message..."
+          className='messageInput'
+          type='text'
+          placeholder='Type your message...'
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
-        <button onClick={sendMessage}>Send</button>
+        <button className='sendMessageButton' onClick={sendMessage}>
+          Send
+        </button>
       </div>
-
-
-      {exitRoom ? (
-        <p>out</p>
-      ) : (
-        <button onClick={handleExitRoom}>방 나가기</button>
-      )}
     </div>
   );
 };
