@@ -6,6 +6,9 @@ import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
 import './RoomDetail.css';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const RoomDetail = () => {
   const [exitRoom, setExitRoom] = useState(false);
   const navigate = useNavigate();
@@ -25,13 +28,13 @@ const RoomDetail = () => {
 
 
   useEffect(() => {
-
+    
     if (!username) {
       navigate('/');
       return null;
     }
-
     setStompClient(stomp);
+    
     const handleNewMessage = (message) => {
       const newMessage = JSON.parse(message.body);
 
@@ -41,24 +44,57 @@ const RoomDetail = () => {
       }
     };
 
+    const newMember = (message) => {
+      const newMessage = JSON.parse(message.body);
+      toast(newMessage.username + "님이 입장하였습니다.");
+    };
+
+    const deleteMember = (message) => {
+      const newMessage = JSON.parse(message.body);
+      toast(newMessage.username + "님이 퇴장하였습니다.");
+    };
+
+
     stomp.connect({}, () => {
+      
       console.log('Connected to SockJS');
 
       // 중복 Subscription 방지
       if (!stomp.subscriptions[`/topic/messages/${roomId}`]) {
         stomp.subscribe(`/topic/messages/${roomId}`, handleNewMessage);
+        stomp.subscribe(`/topic/newMember/${roomId}`, newMember);
+        stomp.subscribe(`/topic/deleteMember/${roomId}`, deleteMember);
+        
       }
+      const message = { content: inputMessage };
+      stomp.send(
+        `/app/RoomDetail/${roomId}/${username}`,
+        {},
+        JSON.stringify(message)
+      );
+
     });
 
     // 컴포넌트 언마운트 시 SockJS 연결 해제
     return () => {
+
+
       if (stomp.connected) {
         stomp.disconnect();
+
+
       }
     };
   }, [roomId]);
 
   const handleExitRoom = () => {
+    const message = { content: inputMessage };
+    stomp.send(
+      `/app/RoomDetailDelete/${roomId}/${username}`,
+      {},
+      JSON.stringify(message)
+    );
+
     setExitRoom(true);
     navigate(-1);
   };
@@ -96,6 +132,7 @@ const RoomDetail = () => {
     scrollToBottom();
   }, [messages]);
 
+
   return (
     <div className='all-container'>
       <div className='List'>
@@ -105,6 +142,9 @@ const RoomDetail = () => {
           <button onClick={handleExitRoom}>방 나가기</button>
         )}
         <h2>Chat Room</h2>
+        <div>
+          <ToastContainer />
+        </div>
         <div className='chat-container'>
           <div className='contentdesign chat-messages' ref={contentRef}>
 

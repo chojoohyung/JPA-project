@@ -9,7 +9,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -96,18 +98,17 @@ public class TestAPIController {
 	 * 채팅방 생성
 	 */
 	@PostMapping("/createChatRoom")
-	public void createChatRoom(String title, int num_of_people) {
+	public Long createChatRoom(String title, int num_of_people) {
 		ChatRoom chatRoom = new ChatRoom();
 		if(title.equals("")) {
 			title = this.usernameData+"님 방";
-		}
-		if (num_of_people <= 0 || num_of_people > 10) {
-			num_of_people = 10;
 		}
 		
 		chatRoom.setTitle(title);
 		chatRoom.setNum_of_people(num_of_people);
 		chatRoomService.createChatRoom(chatRoom);
+		
+		return chatRoom.getId();
 	}
 	
 	@MessageMapping("/sendMessage/{id}/{username}/{content}")
@@ -120,6 +121,39 @@ public class TestAPIController {
 		System.out.println(chattingDto.toString());
 		return chattingDto;
     }
+	
+	
+	@DeleteMapping("/deleteChatRoom/{roomId}")
+    public ResponseEntity<String> deleteChatRoom(@PathVariable Long roomId) {
+        try {
+            chatRoomService.deleteChatRoomById(roomId);
+            return ResponseEntity.ok("Chat room deleted successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error deleting chat room: " + e.getMessage());
+        }
+    }
+	
+	@MessageMapping("/RoomDetail/{id}/{username}")
+	@SendTo("/topic/newMember/{id}")
+	public UsernameDto sendNewMember(@DestinationVariable(value = "id") String id, @DestinationVariable(value = "username") String username) {
+		System.out.println(username+"이거 들어옴");
+		chatRoomService.plus(Long.parseLong(id));
+		
+		
+		UsernameDto usernameDto = new UsernameDto();
+		usernameDto.setUsername(username);
+		return usernameDto;
+	}
+	
+	@MessageMapping("/RoomDetailDelete/{id}/{username}")
+	@SendTo("/topic/deleteMember/{id}")
+	public UsernameDto sendDeleteMember(@DestinationVariable(value = "id") String id, @DestinationVariable(value = "username") String username) {
+		System.out.println(username+"이거 나감");
+		chatRoomService.minus(Long.parseLong(id));
+		UsernameDto usernameDto = new UsernameDto();
+		usernameDto.setUsername(username);
+		return usernameDto;
+	}
 	
 	
 }
