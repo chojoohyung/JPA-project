@@ -2,6 +2,8 @@
 Spring, React Sockjs 로 만든 채팅방 웹입니다.
 
 ### 플레이영상
+https://github.com/chojoohyung/Team-project/assets/100830265/33ff693d-55e1-458c-9b2b-d3b9175cfb56
+
 
 
 ### ScreenShot
