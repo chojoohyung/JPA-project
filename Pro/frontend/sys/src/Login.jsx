@@ -42,6 +42,7 @@ const Login = ({ setLoggedIn }) => {
       if (response.ok) {
         console.log("로그인 성공");
         localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('username', username);
         setLoggedIn(true);
        
       } else {

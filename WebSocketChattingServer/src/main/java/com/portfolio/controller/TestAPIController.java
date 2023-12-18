@@ -110,27 +110,13 @@ public class TestAPIController {
 		chatRoomService.createChatRoom(chatRoom);
 	}
 	
-	/*
-	 * 채팅 생성
-	 */
-	@MessageMapping("/Chat")
-	@SendTo("/topic/message")
-	public ChattingDto sendData(ChattingDto chattingDto) {
-		System.out.println(chattingDto.toString());
-		chattingDto.setCreateDate(LocalDateTime.now());
-		
-		return chattingDto;
-	}
-	
-	
-	@MessageMapping("/sendMessage/{id}/{content}")
+	@MessageMapping("/sendMessage/{id}/{username}/{content}")
     @SendTo("/topic/messages/{id}")
-    public ChattingDto sendMessage(@DestinationVariable(value = "id") String id,  @DestinationVariable(value = "content") String content) {
+    public ChattingDto sendMessage(@DestinationVariable(value = "id") String id, @DestinationVariable(value = "username") String username,  @DestinationVariable(value = "content") String content) {
 		ChattingDto chattingDto = new ChattingDto();
-		chattingDto.setUsername(this.usernameData);
+		chattingDto.setUsername(username);
 		chattingDto.setContent(content);
 		chattingDto.setCreateDate(LocalDateTime.now());
-		System.out.println(id);
 		System.out.println(chattingDto.toString());
 		return chattingDto;
     }

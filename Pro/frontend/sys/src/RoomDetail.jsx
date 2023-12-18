@@ -17,11 +17,21 @@ const RoomDetail = () => {
   const [stompClient, setStompClient] = useState(null);
   const contentRef = useRef();
 
-  useEffect(() => {
-    const socket = new SockJS(`http://localhost:8081/ws`);
-    const stomp = Stomp.over(socket);
-    setStompClient(stomp);
+  const username = localStorage.getItem('username');
 
+  const socket = new SockJS(`http://localhost:8081/ws`);
+  const stomp = Stomp.over(socket);
+
+
+
+  useEffect(() => {
+
+    if (!username) {
+      navigate('/');
+      return null;
+    }
+
+    setStompClient(stomp);
     const handleNewMessage = (message) => {
       const newMessage = JSON.parse(message.body);
 
@@ -46,7 +56,7 @@ const RoomDetail = () => {
         stomp.disconnect();
       }
     };
-  }, [roomId, messages]);
+  }, [roomId]);
 
   const handleExitRoom = () => {
     setExitRoom(true);
@@ -65,7 +75,7 @@ const RoomDetail = () => {
       const message = { content: inputMessage };
 
       stompClient.send(
-        `/app/sendMessage/${roomId}/${inputMessage}`,
+        `/app/sendMessage/${roomId}/${username}/${inputMessage}`,
         {},
         JSON.stringify(message)
       );
@@ -97,18 +107,50 @@ const RoomDetail = () => {
         <h2>Chat Room</h2>
         <div className='chat-container'>
           <div className='contentdesign chat-messages' ref={contentRef}>
+
+
             {messages.map((msg, index) => (
-              <div key={index} className='message'>
-                {msg.username && <p className='message-username'>{msg.username}</p>}
-                <p className='message-content'>{msg.content}</p>
-                {msg.createDate && (
-                  <span className='message-date'> {new Date(msg.createDate).toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}</span>
-                )}
+              <div key={index} className={`message ${msg.username === username ? 'right-aligned' : ''}`}>
+                <div className=''>
+                  {msg.username !== username && msg.username !== messages[index - 1]?.username && (
+                    <p
+                      className='message-username'
+                      style={{ color: msg.username === username ? 'red' : 'inherit' }}
+                    >
+                      {msg.username}
+                    </p>
+                  )}
+                  {msg.username === username ? (
+                    <>
+                      {msg.createDate && (
+                        <span className='message-date'> {new Date(msg.createDate).toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}</span>
+                      )}
+                      <p className='message-content'>{msg.content}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className='message-content'>{msg.content}</p>
+                      {msg.createDate && (
+                        <span className='message-date'> {new Date(msg.createDate).toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}</span>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
             ))}
+
+
+
+
+
+
+
           </div>
         </div>
       </div>

@@ -20,6 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         WebSocketMessageBrokerConfigurer.super.registerStompEndpoints(registry);
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS(); // 모든 도메인 허용
+        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS()
+        		.setDisconnectDelay(30*1000); // 모든 도메인 허용
     }
 }
