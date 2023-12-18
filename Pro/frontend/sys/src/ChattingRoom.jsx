@@ -29,6 +29,7 @@ const ChattingRoom = () => {
 
   useEffect(() => {
     sendGetRequest();
+    
   }, []);
 
   const createChatRoom = async () => {

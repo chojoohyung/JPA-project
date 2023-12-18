@@ -28,13 +28,13 @@ const RoomDetail = () => {
 
 
   useEffect(() => {
-    
+
     if (!username) {
       navigate('/');
       return null;
     }
     setStompClient(stomp);
-    
+
     const handleNewMessage = (message) => {
       const newMessage = JSON.parse(message.body);
 
@@ -56,7 +56,7 @@ const RoomDetail = () => {
 
 
     stomp.connect({}, () => {
-      
+
       console.log('Connected to SockJS');
 
       // 중복 Subscription 방지
@@ -64,7 +64,7 @@ const RoomDetail = () => {
         stomp.subscribe(`/topic/messages/${roomId}`, handleNewMessage);
         stomp.subscribe(`/topic/newMember/${roomId}`, newMember);
         stomp.subscribe(`/topic/deleteMember/${roomId}`, deleteMember);
-        
+
       }
       const message = { content: inputMessage };
       stomp.send(
@@ -77,7 +77,14 @@ const RoomDetail = () => {
 
     // 컴포넌트 언마운트 시 SockJS 연결 해제
     return () => {
-
+      const message = { content: inputMessage };
+      if (!stomp) {
+        stomp.send(
+          `/app/RoomDetailDelete/${roomId}/${username}`,
+          {},
+          JSON.stringify(message)
+        );
+      }
 
       if (stomp.connected) {
         stomp.disconnect();
